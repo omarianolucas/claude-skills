@@ -1,20 +1,28 @@
 ---
 name: workdrive
-description: Use this skill for any Zoho WorkDrive operation — create folders, list files, move/copy/trash files, search, get file details. Also handles OAuth2 token refresh for all Zoho APIs.
-version: 0.1.0
+description: Use this skill for Zoho WorkDrive operations — create folders, list files, move/copy/trash/delete files, search. Also used when user mentions "workdrive", "criar pasta", "listar arquivos", "mover arquivo".
+version: 0.2.0
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 argument-hint: <operation> [args]
 ---
 
 # Skill: /workdrive — Zoho WorkDrive Operations
 
-Operacoes no Zoho WorkDrive via API REST. Tambem gerencia OAuth2 para todas as APIs Zoho (Writer, Sheet, WorkDrive).
+CRUD de pastas e arquivos no Zoho WorkDrive via API REST.
+
+---
+
+## Scopes
+
+```
+WorkDrive.files.ALL, WorkDrive.organization.ALL, WorkDrive.workspace.ALL
+```
+
+Variavel no secrets.env: `ZOHO_REFRESH_TOKEN_WORKDRIVE`
 
 ---
 
 ## OAuth2
-
-Credenciais em `~/.claude/secrets.env`. Sempre carregar e renovar o access token no inicio de cada operacao.
 
 ```bash
 source ~/.claude/secrets.env
@@ -27,16 +35,6 @@ TOKEN=$(curl -s -X POST "https://accounts.zoho.com/oauth/v2/token" \
 ```
 
 Auth header: `Authorization: Bearer $TOKEN`
-
-### secrets.env (template)
-```env
-ZOHO_CLIENT_ID=
-ZOHO_CLIENT_SECRET=
-ZOHO_REFRESH_TOKEN_WORKDRIVE=
-ZOHO_REFRESH_TOKEN_MEET=
-ZOHO_ORG_ID=
-```
-Cada membro do time cria o seu em `~/.claude/secrets.env`. Nunca commitar no git.
 
 ---
 
@@ -101,17 +99,3 @@ curl -s -X POST "https://www.zohoapis.com/workdrive/api/v1/files" \
   -d '{"data":{"attributes":{"name":"NOME","parent_id":"FOLDER_ID","service_type":"zw"},"type":"files"}}'
 ```
 `service_type`: `zw` (Writer), `zohosheet` (Sheet), `zohoshow` (Show)
-
----
-
-## IDs conhecidos
-
-### Team Folder: Success
-- Team ID: `qn8bbaab53b29144a4ea497dc029575a4c3d4`
-- Library ID: `l0dnwfd181094cb5f4ac7a2c5dc8edc824cfb`
-- Dominio: `workdrive.inbox.ac`
-
-### Pasta Email Intelligence
-- Root: `e6ecq456d877840c142f6a133a4bb4847f339`
-  - cases/: `e6ecq49cce46733684c5a8ccff21b24cb8812`
-  - ab-tests/: `e6ecq851e5c6cc0304833a3563c12f3128683`
