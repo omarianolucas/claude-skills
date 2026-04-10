@@ -14,17 +14,29 @@ Operacoes no Zoho WorkDrive via API REST. Tambem gerencia OAuth2 para todas as A
 
 ## OAuth2
 
-Credenciais salvas em memoria (`zoho_oauth2.md`). Sempre renovar o access token no inicio de cada operacao.
+Credenciais em `~/.claude/secrets.env`. Sempre carregar e renovar o access token no inicio de cada operacao.
 
 ```bash
+source ~/.claude/secrets.env
+
 TOKEN=$(curl -s -X POST "https://accounts.zoho.com/oauth/v2/token" \
-  -d "refresh_token=<REFRESH_TOKEN>" \
-  -d "client_id=<CLIENT_ID>" \
-  -d "client_secret=<CLIENT_SECRET>" \
+  -d "refresh_token=$ZOHO_REFRESH_TOKEN_WORKDRIVE" \
+  -d "client_id=$ZOHO_CLIENT_ID" \
+  -d "client_secret=$ZOHO_CLIENT_SECRET" \
   -d "grant_type=refresh_token" | python3 -c "import sys,json; print(json.loads(sys.stdin.read())['access_token'])")
 ```
 
 Auth header: `Authorization: Bearer $TOKEN`
+
+### secrets.env (template)
+```env
+ZOHO_CLIENT_ID=
+ZOHO_CLIENT_SECRET=
+ZOHO_REFRESH_TOKEN_WORKDRIVE=
+ZOHO_REFRESH_TOKEN_MEET=
+ZOHO_ORG_ID=
+```
+Cada membro do time cria o seu em `~/.claude/secrets.env`. Nunca commitar no git.
 
 ---
 

@@ -14,17 +14,19 @@ Operacoes no Zoho Meet via API REST. Gerencia gravacoes e meetings.
 
 ## OAuth2
 
-Credenciais salvas em memoria (`zoho_oauth2.md`). Mesmo Client ID/Secret das outras APIs Zoho, refresh token especifico do Meet.
+Credenciais em `~/.claude/secrets.env` (ver skill `/workdrive` para template).
 
 ```bash
+source ~/.claude/secrets.env
+
 TOKEN=$(curl -s -X POST "https://accounts.zoho.com/oauth/v2/token" \
-  -d "refresh_token=<MEET_REFRESH_TOKEN>" \
-  -d "client_id=<CLIENT_ID>" \
-  -d "client_secret=<CLIENT_SECRET>" \
+  -d "refresh_token=$ZOHO_REFRESH_TOKEN_MEET" \
+  -d "client_id=$ZOHO_CLIENT_ID" \
+  -d "client_secret=$ZOHO_CLIENT_SECRET" \
   -d "grant_type=refresh_token" | python3 -c "import sys,json; print(json.loads(sys.stdin.read())['access_token'])")
 ```
 
-**Org ID (zsoid):** `777191179`
+**Org ID:** `$ZOHO_ORG_ID` (default: `777191179`)
 
 ---
 

@@ -45,7 +45,7 @@ Salvos em `~/.claude/skills/case/templates/`:
 ### `/case novo [cliente]`
 Criar um novo case para o cliente informado.
 
-1. Obter token via `/workdrive` (OAuth2)
+1. Obter token via `/workdrive` (`source ~/.claude/secrets.env` + OAuth2)
 2. Listar arquivos em `cases/` para verificar se ja existe pasta do cliente
 3. Se nao existir pasta:
    a. Criar pasta do cliente em `cases/` via `/workdrive`
