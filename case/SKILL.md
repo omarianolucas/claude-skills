@@ -1,7 +1,7 @@
 ---
 name: case
 description: This skill should be used when the user asks to "create a new case", "document a case", "fill case data", "check case status", "analyze a case", "generate one-pager", "rank cases", "check claims", "generate case visual". Manages Email Intelligence case studies.
-version: 0.4.0
+version: 0.5.0
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, mcp__zoho-sheet__*, mcp__zoho-workdrive__*, mcp__zoho-writer__*]
 argument-hint: <subcommand> [cliente]
 ---
@@ -58,11 +58,13 @@ Criar um novo case para o cliente informado.
 3. Listar arquivos em `cases/` para verificar se ja existe pasta do cliente
 4. Se nao existir pasta:
    a. Criar pasta do cliente em `cases/` (usando /workdrive)
-   b. Criar 3 docs na pasta (usando /doc + /brand pra estilo):
+   b. Criar subpasta `Evidencias` dentro da pasta do cliente (usando /workdrive)
+      - Aqui serao armazenados prints, screenshots, gravacoes e qualquer arquivo de prova
+   c. Criar 3 docs na pasta principal do cliente (usando /doc + /brand pra estilo):
       - `filename=Case Document - [Cliente]` usando `templates/case-document.html`
       - `filename=Transcription - [Cliente]` usando `templates/transcription.html`
       - `filename=One-Pager - [Cliente]` usando `templates/onepager.html`
-   c. Substituir "ACME" pelo nome real do cliente nos HTMLs antes de enviar
+   d. Substituir "ACME" pelo nome real do cliente nos HTMLs antes de enviar
 5. Se ja existir pasta: pular criacao, informar que pasta ja existe
 6. Ler planilha Cases para descobrir proximo ID sequencial (CASE-XXX)
 7. Adicionar linha na planilha Cases com:
@@ -75,6 +77,24 @@ Criar um novo case para o cliente informado.
    - Criar o mapa visual no Miro e colar o link no case doc
    - Coletar provas (prints, screenshots, gravacoes) e fazer upload na pasta
 9. Confirmar criacao ao usuario com checklist do que foi criado
+
+### `/case evidencia [cliente]`
+Receber prints/screenshots/arquivos e salvar na pasta Evidencias do case.
+
+1. Checar dependencias obrigatorias
+2. Obter token
+3. Buscar a pasta do cliente em `cases/`
+4. Verificar se subpasta `Evidencias` existe; se nao, criar
+5. O usuario pode enviar:
+   - **Caminho local** de arquivo(s) (ex: `~/Desktop/print1.png`)
+   - **Imagem colada/arrastada** no chat
+6. Para cada arquivo/imagem recebido:
+   a. Ler/analisar o conteudo (extrair metricas, textos, dados visiveis)
+   b. Fazer upload pro WorkDrive na pasta `Evidencias` do cliente (usando /workdrive upload)
+   c. Anotar resumo do que foi extraido
+7. Perguntar ao usuario se quer que as informacoes extraidas sejam adicionadas ao Case Document
+8. Se sim: ler o doc atual primeiro (NUNCA sobrescrever), fazer merge adicionando os dados novos
+9. Atualizar planilha Cases se algum campo novo foi preenchido
 
 ### `/case preencher [cliente]`
 Receber dados brutos do usuario e preencher os documentos corretos.
@@ -107,7 +127,8 @@ Mostrar checklist do que tem vs. o que falta.
    - [ ] Entrevista realizada/transcrita
    - [ ] One-pager gerado
    - [ ] Mapa visual criado (Miro)
-   - [ ] Provas coletadas
+   - [ ] Pasta Evidencias criada
+   - [ ] Provas coletadas (prints/screenshots na pasta Evidencias)
    - [ ] Depoimento coletado
    - [ ] Nota Prova atribuida (0-10)
    - [ ] Campos da planilha completos
