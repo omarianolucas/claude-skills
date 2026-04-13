@@ -1,7 +1,7 @@
 ---
 name: workdrive
-description: Use this skill for Zoho WorkDrive operations — create folders, list files, move/copy/trash/delete files, search. Also used when user mentions "workdrive", "criar pasta", "listar arquivos", "mover arquivo".
-version: 0.2.0
+description: Use this skill for Zoho WorkDrive operations — create folders, list files, move/copy/trash/delete files, search, upload files. Also used when user mentions "workdrive", "criar pasta", "listar arquivos", "mover arquivo", "upload", "subir arquivo".
+version: 0.3.0
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 argument-hint: <operation> [args]
 ---
@@ -99,3 +99,72 @@ curl -s -X POST "https://www.zohoapis.com/workdrive/api/v1/files" \
   -d '{"data":{"attributes":{"name":"NOME","parent_id":"FOLDER_ID","service_type":"zw"},"type":"files"}}'
 ```
 `service_type`: `zw` (Writer), `zohosheet` (Sheet), `zohoshow` (Show)
+
+### Upload de arquivo (ate ~250MB)
+```bash
+curl -s -X POST "https://www.zohoapis.com/workdrive/api/v1/upload" \
+  -H "Authorization: Bearer $TOKEN" \
+  -F "content=@/caminho/do/arquivo.pdf" \
+  -F "parent_id=PARENT_FOLDER_ID" \
+  -F "override-name-exist=true"
+```
+Parametros form-data:
+- `content` (obrigatorio) — arquivo binario
+- `parent_id` (obrigatorio) — ID da pasta destino
+- `override-name-exist` (opcional) — `true` para sobrescrever se ja existir arquivo com mesmo nome
+
+Response:
+```json
+{
+  "data": [{
+    "attributes": {
+      "Permalink": "https://www.zohoapis.com/workdrive/file/{resource_id}",
+      "parent_id": "PARENT_FOLDER_ID",
+      "FileName": "arquivo.pdf",
+      "resource_id": "RESOURCE_ID"
+    },
+    "type": "files"
+  }]
+}
+```
+
+### Upload de arquivo grande (stream, >250MB)
+Endpoint diferente — usa `upload.zoho.com`:
+```bash
+curl -s -X POST "https://upload.zoho.com/workdrive-api/v1/stream/upload" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "x-filename: arquivo_grande.zip" \
+  -H "x-parent_id: PARENT_FOLDER_ID" \
+  -H "upload-id: UPLOAD_ID_UNICO" \
+  -H "x-streammode: 1" \
+  -H "Content-Type: application/octet-stream" \
+  --data-binary @/caminho/do/arquivo_grande.zip
+```
+Headers obrigatorios:
+- `x-filename` — nome do arquivo
+- `x-parent_id` — ID da pasta destino
+- `upload-id` — string unica para identificar o upload
+- `x-streammode: 1` — ativa modo stream
+- `Content-Type: application/octet-stream`
+
+Response:
+```json
+{
+  "data": [{
+    "attributes": {
+      "file_name": "arquivo_grande.zip",
+      "parent_id": "PARENT_FOLDER_ID",
+      "resource_id": "RESOURCE_ID"
+    },
+    "type": "API_UPLOAD"
+  }],
+  "status": "SUCCESS"
+}
+```
+
+### Checar status de upload
+```bash
+curl -s "https://www.zohoapis.com/workdrive/uploadprogress?uploadid=upload_{ZohoUserID}_{upload-id}" \
+  -H "Authorization: Bearer $TOKEN"
+```
+O `uploadid` segue o formato: `upload_{ZohoUserID}_{upload-id_usado_no_stream_upload}`
