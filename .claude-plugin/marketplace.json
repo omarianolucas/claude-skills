@@ -1,0 +1,17 @@
+{
+  "name": "inbox-plugins",
+  "owner": {
+    "name": "Inbox"
+  },
+  "metadata": {
+    "description": "Plugins oficiais do time Inbox"
+  },
+  "plugins": [
+    {
+      "name": "inbox-tools",
+      "source": "./plugins/inbox-tools",
+      "description": "Skills do time Inbox — Zoho APIs, cases, docs, brand",
+      "version": "1.0.0"
+    }
+  ]
+}
