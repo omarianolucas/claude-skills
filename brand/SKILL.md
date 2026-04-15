@@ -1,7 +1,7 @@
 ---
 name: brand
 description: Inbox brand guidelines — colors, fonts, visual style. Use when the user asks about brand colors, fonts, visual identity, "what color should I use", "what font", "brand guide", "brandbook", "identidade visual", "paleta de cores", or when deciding visual direction for any asset. Also use when creating presentations, landing pages, social media, or any visual that needs Inbox branding (but NOT for Zoho Writer documents — those use the /doc skill which has its own style guide). Do NOT use for creating/editing docs in Writer (that's /doc) or file operations (that's /workdrive).
-version: 0.2.0
+version: 0.2.1
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: [question or context]
 ---
@@ -116,3 +116,15 @@ Use these for data visualization, charts, illustrations, and decorative elements
 - Emojis in professional document titles
 - Dark background with white table headers in Writer (use `#f5f5f5` bg with `#161616` text)
 - `<blockquote>` in Writer (renders poorly — use `<p>` with border-left instead)
+
+---
+
+## Usage Examples
+
+```
+/brand quais cores usar pra um post do InboxAcademy?
+/brand qual fonte usar numa landing page?
+/brand paleta de cores pra um grafico de 4 metricas
+/brand estilo visual pra uma apresentacao dark mode
+/brand qual a cor accent padrao do Inbox?
+```
