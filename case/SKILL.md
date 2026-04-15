@@ -32,7 +32,7 @@ Se faltar alguma: informar o usuario e instruir a usar `/setup`.
 ## Subcomandos
 
 ### `/case novo [cliente]`
-Criar um novo case. Cria pasta + subpasta Evidencias + docs branded (Case Document, Transcription, One-Pager). Adiciona linha na planilha Cases. Sempre verificar se ja existe antes de criar — nunca duplicar. Ver `references/known-ids.md` para IDs de pastas e planilhas.
+Criar um novo case. Perguntar o nome do cliente se nao for informado. Cria pasta + subpasta Evidencias + docs branded (Case Document, Transcription, One-Pager). Substituir `[Nome do Cliente]` pelo nome real nos templates HTML antes de enviar. Adiciona linha na planilha Cases. Sempre verificar se ja existe antes de criar — nunca duplicar. Ver `references/known-ids.md` para IDs de pastas e planilhas.
 
 ### `/case evidencia [cliente]`
 Receber prints/screenshots/arquivos, fazer upload na pasta Evidencias, extrair dados visiveis, e opcionalmente mergear no Case Document.
@@ -76,15 +76,15 @@ Gerar one-pager de vendas extraindo dados do case doc. Usar template `templates/
 ## Usage Examples
 
 ```
-/case novo Acme Corp
-/case preencher Acme Corp
-/case evidencia Acme Corp
-/case status Acme Corp
+/case novo
+/case preencher [nome do cliente]
+/case evidencia [nome do cliente]
+/case status [nome do cliente]
 /case status
-/case analisar Acme Corp
+/case analisar [nome do cliente]
 /case ranking
 /case claims
-/case onepager Acme Corp
+/case onepager [nome do cliente]
 ```
 
 ---
