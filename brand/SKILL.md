@@ -1,115 +1,118 @@
 ---
 name: brand
-description: Use this skill when the user asks about brand colors, fonts, visual style, brand guidelines, "what color should I use", "what font", "brand guide", "brandbook", or when creating any visual asset (HTML templates, docs, presentations) that needs to follow Inbox brand identity.
-version: 0.1.0
+description: Inbox brand guidelines — colors, fonts, visual style. Use when the user asks about brand colors, fonts, visual identity, "what color should I use", "what font", "brand guide", "brandbook", "identidade visual", "paleta de cores", or when deciding visual direction for any asset. Also use when creating presentations, landing pages, social media, or any visual that needs Inbox branding (but NOT for Zoho Writer documents — those use the /doc skill which has its own style guide). Do NOT use for creating/editing docs in Writer (that's /doc) or file operations (that's /workdrive).
+version: 0.2.0
 allowed-tools: [Read, Write, Edit, Glob, Grep, Bash]
 argument-hint: [question or context]
 ---
 
 # Skill: /brand — Inbox Brand Guidelines
 
-Referencia rapida do branding da Inbox. Usar sempre que criar templates HTML, docs no Writer, materiais visuais ou qualquer asset que precise seguir a identidade visual.
+Quick reference for Inbox brand identity. Use for presentations, landing pages, social assets, email templates, or any visual that needs brand consistency.
+
+For **Zoho Writer documents**, the /doc skill has its own style guide at `~/.claude/skills/doc/references/style-guide.md` with Writer-specific adaptations already baked in. Don't duplicate that work here — this skill covers the broader brand system.
 
 ---
 
-## Cores
+## Colors
 
-### Primarias
-| Nome | Hex | RGB | Uso |
-|------|-----|-----|-----|
-| **Night** | `#161616` | R22 G22 B22 | Fundo principal, texto em fundo claro, logos |
-| **White** | `#FFFFFF` | R255 G255 B255 | Fundo claro, texto em fundo escuro |
+### Core
 
-### Secundaria
-| Nome | Hex | RGB | Uso |
-|------|-----|-----|-----|
-| **French Gray** | `#A9ABB0` | R169 G171 B176 | Texto secundario, bordas, notas, placeholders |
+| Name | Hex | Usage |
+|------|-----|-------|
+| **Night** | `#161616` | Primary background (dark mode), text on light backgrounds, logos |
+| **White** | `#FFFFFF` | Light backgrounds, text on dark backgrounds |
+| **French Gray** | `#A9ABB0` | Secondary text, borders, notes, placeholders, dividers |
 
-### Cores das Submarcas
-| Submarca | Nome | Hex | RGB |
-|----------|------|-----|-----|
-| InboxAcademy | **Turquesa** | `#00D0B7` | R0 G208 B183 |
-| InboxUniversity | **Electric Blue** | `#004CFF` | R0 G76 B255 |
-| InboxCommunity | **Rose** | `#FF1F7D` | R255 G31 B125 |
+### Submarca Accents
 
-### Paleta Complementar (3 tons: escuro, medio, claro)
-| Nome | Hex 1 | Hex 2 | Hex 3 | Significado |
-|------|-------|-------|-------|-------------|
-| **Menta** | `#90FFC3` | `#B4FFD6` | — | Crescimento, etica, energia |
-| **Turquesa** | `#00D0B7` | `#49E9D6` | — | Crescimento, agilidade, aprendizado |
-| **Jasmine** | `#FFE37F` | `#FFECAA` | — | Energia, otimizacao, inteligencia |
-| **Atomic Tangerine** | `#FFB190` | `#FFC4AC` | — | Criatividade, entusiasmo, inovacao |
-| **Rose** | `#FF1F7D` | `#FF6CAA` | — | Colaboracao, empatia, conexao |
-| **Electric Purple** | `#A54AFF` | `#B76FFF` | — | Tecnologia, criatividade, inovacao |
-| **Electric Blue** | `#004CFF` | `#336FFF` | — | Qualificacao, estabilidade, confianca |
+Each Inbox sub-brand has a signature color. Use these as primary accents when the context is clearly tied to one sub-brand:
 
----
+| Submarca | Color | Hex | When to use |
+|----------|-------|-----|-------------|
+| InboxAcademy | **Turquesa** | `#00D0B7` | Courses, learning, educational content, growth metrics |
+| InboxUniversity | **Electric Blue** | `#004CFF` | Certifications, formal programs, institutional content |
+| InboxCommunity | **Rose** | `#FF1F7D` | Community events, networking, collaboration, social |
 
-## Tipografia
+When the context doesn't belong to a specific sub-brand (general Inbox content), default to **Turquesa** `#00D0B7` as the primary accent.
 
-### Fonte Principal: Axiforma
-- Tipo: Geometric Sans (licenca paga)
-- Pesos: Light, Book, Medium, Semibold, Bold, Extrabold
-- Uso: branding oficial, logo, materiais impressos
+### Complementary Palette
 
-### Fonte Secundaria: Poppins
-- Tipo: Geometric Sans (Google Fonts, gratuita)
-- Substitui Axiforma onde nao esta disponivel
-- **Usar Poppins no Zoho Writer** (disponivel nativamente)
-- Roboto tambem funciona como alternativa no Writer
+Use these for data visualization, charts, illustrations, and decorative elements — not for text or primary UI:
 
-### Hierarquia Tipografica
-| Elemento | Peso | Tamanho ref (ppt) |
-|----------|------|--------------------|
-| Nome de secao/assunto | Book | 48px |
-| Titulos | **Bold** | 128px |
-| Subtitulos | Light | 64px |
-| Corpo | Book | 24px |
+| Name | Dark | Light | Mood |
+|------|------|-------|------|
+| **Menta** | `#90FFC3` | `#B4FFD6` | Growth, ethics, energy |
+| **Turquesa** | `#00D0B7` | `#49E9D6` | Growth, agility, learning |
+| **Jasmine** | `#FFE37F` | `#FFECAA` | Energy, optimization, intelligence |
+| **Atomic Tangerine** | `#FFB190` | `#FFC4AC` | Creativity, enthusiasm, innovation |
+| **Rose** | `#FF1F7D` | `#FF6CAA` | Collaboration, empathy, connection |
+| **Electric Purple** | `#A54AFF` | `#B76FFF` | Technology, creativity, innovation |
+| **Electric Blue** | `#004CFF` | `#336FFF` | Qualification, stability, trust |
 
-*Tamanhos variam conforme a peca, mas manter proporcoes e hierarquia.*
+**For charts:** pick 3-4 colors max from this palette. Start with the sub-brand accent, then add complementary colors that contrast well. Avoid using all 7 at once.
 
 ---
 
-## Estilo Visual
+## Typography
 
-### Tom Geral
-- **Dark mode dominante** (fundo `#161616`)
-- Moderno, minimalista, tech-forward, premium B2B SaaS
-- Cantos arredondados em todos os elementos
+### Fonts
 
-### Efeitos
-- **Glassmorphism**: cards com fundo semi-transparente + blur
-- **Glows**: manchas de cor complementar com blur no fundo
-- **Grid sutil**: linhas finas no background
-- **Lowercase**: titulos em caixa baixa (estilo do brandbook)
+| Font | Type | Where to use |
+|------|------|--------------|
+| **Axiforma** | Geometric Sans (paid license) | Official branding, logo, print materials, decks |
+| **Poppins** | Geometric Sans (Google Fonts, free) | Zoho Writer, web, email templates, anything Axiforma isn't available |
+| **Roboto** | Sans-serif (fallback) | When neither Axiforma nor Poppins is available |
 
-### Elementos Visuais
-- Icones com linhas uniformes (24px de espessura no logo)
-- Cards com borda sutil semi-transparente (glassmorphism)
-- Numeracao em cor de accent (turquesa `#00D0B7`)
+### Hierarchy by context
+
+**Presentations / Landing Pages (dark background):**
+
+| Element | Weight | Relative size |
+|---------|--------|---------------|
+| Section label | Book | Small (caption) |
+| Title | **Bold** | Extra large |
+| Subtitle | Light | Large |
+| Body | Book | Base |
+
+**Documents / Reports (light background):**
+
+| Element | Size | Weight |
+|---------|------|--------|
+| H1 | 21pt | Bold (700) |
+| H2 | 16pt | Semibold (600) |
+| H3 | 13pt | Semibold (600) |
+| Body | 12pt | Regular (400) |
+| Table cells | 11pt | Regular |
+| Notes | 10pt | Regular |
+
+*For Zoho Writer specifics (inline styles, font-family repetition, etc), see the /doc skill's style guide.*
 
 ---
 
-## Adaptacao para Docs Writer (fundo branco)
+## Visual Style
 
-Como os docs do Zoho Writer tem fundo branco, adaptar assim:
+### Dark Mode (default brand context)
+- Background: `#161616`
+- **Glassmorphism** cards: semi-transparent background + blur
+- **Glow effects**: complementary color blurs behind elements
+- **Subtle grid**: thin lines in background
+- **Lowercase** titles (brandbook convention)
+- Rounded corners on all elements
+- Modern, minimalist, tech-forward, premium B2B SaaS feel
 
-| Elemento | Estilo |
-|----------|--------|
-| H1 (titulo principal) | Poppins Bold, cor `#161616`, border-bottom `#161616` |
-| H2 (secoes) | Poppins Semibold, cor `#161616`, border-bottom `#A9ABB0` |
-| Texto corpo | Poppins Regular, cor `#161616` |
-| Texto secundario/notas | Poppins Regular, cor `#A9ABB0` |
-| Labels de tabela (coluna esquerda) | Poppins Semibold, cor `#161616` |
-| Borders de tabela | `#A9ABB0` ou `#e2e8f0` |
-| Background de destaque | `#f5f5f5` (cinza muito claro) |
-| Cards de metricas | Fundo `#161616`, texto `#FFFFFF` |
-| Blockquotes | border-left `#00D0B7` (turquesa), background `#f5f5f5` |
-| Accent para highlights | `#00D0B7` (turquesa) ou `#004CFF` (electric blue) |
-| Notas internas | Cor `#A9ABB0`, fundo `#f8f9fa` |
+### Light Mode (docs, emails, reports)
+- Background: `#FFFFFF`
+- Text: `#161616`
+- Accents: `#00D0B7` or `#004CFF`
+- Borders: `#A9ABB0`
+- Header backgrounds: `#f5f5f5`
+- No glassmorphism (doesn't translate well to light mode)
 
-### Nao usar
-- Cores fora da paleta
-- Fontes serifadas
-- Gradients excessivos (manter o estilo limpo e minimalista)
-- Emojis nos titulos de docs profissionais
+### What to avoid
+- Colors outside the palette
+- Serif fonts
+- Heavy gradients (keep it clean and minimal)
+- Emojis in professional document titles
+- Dark background with white table headers in Writer (use `#f5f5f5` bg with `#161616` text)
+- `<blockquote>` in Writer (renders poorly — use `<p>` with border-left instead)

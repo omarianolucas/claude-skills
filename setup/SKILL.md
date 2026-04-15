@@ -1,144 +1,152 @@
 ---
 name: setup
-description: Use this skill to install skills, configure APIs, and manage the skills ecosystem. Also used when user mentions "setup", "instalar skill", "configurar API", "onboarding", "atualizar skills".
-version: 0.1.0
+description: Install skills, configure Zoho APIs (OAuth2), manage the skills ecosystem, and onboard new users. Use when user mentions "setup", "instalar skill", "configurar API", "onboarding", "atualizar skills", "listar skills", "status das skills", "configurar zoho", "self client", "refresh token", or needs help getting started with the tooling. Do NOT use for actual document creation (that's /doc), file management (that's /workdrive), or brand questions (that's /brand).
+version: 0.2.0
 allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 argument-hint: [subcommand]
 ---
 
-# Skill: /setup — Instalar Skills e Configurar APIs
+# Skill: /setup — Install Skills & Configure APIs
 
-Ponto de entrada para novos membros do time e gestao das skills instaladas.
+Entry point for new team members and management of installed skills.
 
 **Repo:** github.com/omarianolucas/claude-skills
 
 ---
 
-## Subcomandos
+## Subcommands
 
-### `/setup` (sem argumentos)
-Fluxo completo de onboarding.
+### `/setup` (no args)
+Full onboarding flow:
 
-1. Verificar se `~/.claude/secrets.env` existe. Se nao, criar a partir do template.
-2. Listar skills disponiveis no repo (ver catalogo abaixo)
-3. Perguntar quais o usuario quer instalar
-4. Baixar as skills escolhidas do GitHub pra `~/.claude/skills/`
-5. Para cada skill que precisa de API (tem secao Scopes):
-   a. Mostrar os escopos necessarios
-   b. Perguntar se o usuario ja tem um Self Client no Zoho
-   c. Se nao: guiar criacao em console.zoho.com → Add Client → Self Client
-   d. Pedir Client ID e Client Secret (salvar no secrets.env)
-   e. Instruir a gerar authorization code com os escopos listados
-   f. Pedir o code gerado
-   g. Trocar pelo refresh token via API:
+1. Check if `~/.claude/secrets.env` exists — if not, create from template
+2. List available skills (see catalog below)
+3. Ask which ones to install
+4. Download chosen skills from GitHub to `~/.claude/skills/`
+5. For each skill that needs an API (has Scopes section):
+   a. Show required scopes
+   b. Check if user already has a Self Client on Zoho
+   c. If not: guide creation at console.zoho.com → Add Client → Self Client
+   d. Ask for Client ID and Client Secret (save to secrets.env)
+   e. Instruct to generate authorization code with listed scopes
+   f. Ask for the generated code
+   g. Exchange for refresh token:
       ```bash
       curl -s -X POST "https://accounts.zoho.com/oauth/v2/token" \
-        -d "code=CODE_DO_USUARIO" \
+        -d "code=USER_CODE" \
         -d "client_id=$ZOHO_CLIENT_ID" \
         -d "client_secret=$ZOHO_CLIENT_SECRET" \
         -d "grant_type=authorization_code"
       ```
-   h. Salvar refresh token no secrets.env na variavel correta
-   i. Testar a conexao fazendo uma chamada simples
-6. Confirmar que tudo esta funcionando
+   h. Save refresh token to secrets.env
+   i. Test connection with a simple API call
+6. Confirm everything works
 
 ### `/setup list`
-Listar skills disponiveis no repo.
+List available skills.
 
-1. Buscar pastas no repo via GitHub API:
+1. Fetch repo contents via GitHub API:
    ```bash
    curl -s "https://api.github.com/repos/omarianolucas/claude-skills/contents/" | python3 -c "
    import sys,json
    for item in json.loads(sys.stdin.read()):
-       if item['type'] == 'dir' and not item['name'].startswith(('_','.')) :
+       if item['type'] == 'dir' and not item['name'].startswith(('_','.')):
            print(item['name'])
    "
    ```
-2. Para cada skill, buscar o frontmatter do SKILL.md pra mostrar nome e descricao
-3. Marcar quais ja estao instaladas localmente
+2. For each skill, fetch SKILL.md frontmatter to show name and description
+3. Mark which ones are already installed locally
 
 ### `/setup install [skill1] [skill2] ...`
-Instalar skills especificas.
+Install specific skills.
 
-1. Para cada skill solicitada:
-   a. Verificar se ja esta instalada em `~/.claude/skills/`
-   b. Se nao, baixar do GitHub:
+1. For each skill:
+   a. Check if already in `~/.claude/skills/`
+   b. If not, download from GitHub:
       ```bash
-      # Baixar SKILL.md
       curl -sL "https://raw.githubusercontent.com/omarianolucas/claude-skills/main/SKILL_NAME/SKILL.md" \
         -o ~/.claude/skills/SKILL_NAME/SKILL.md --create-dirs
-
-      # Se tiver subpastas (templates, references), baixar tambem
+      # Also download subfolders (references/, scripts/, etc.) if they exist
       ```
-   c. Se a skill tem secao Scopes, avisar que precisa configurar API
-2. Listar o que foi instalado e o que falta configurar
+   c. If skill has Scopes section, warn that API config is needed
+2. List what was installed and what needs API config
 
 ### `/setup update`
-Checar e atualizar skills instaladas.
+Check and update installed skills.
 
-1. Para cada skill em `~/.claude/skills/`:
-   a. Ler a versao local (frontmatter `version`)
-   b. Buscar a versao no repo via GitHub API
-   c. Se versao remota > local: baixar a nova versao
-   d. Se tem subpastas (templates, references): atualizar tambem
-2. Mostrar o que foi atualizado
+1. For each skill in `~/.claude/skills/`:
+   a. Read local version (frontmatter `version`)
+   b. Fetch remote version via GitHub API
+   c. If remote > local: download new version (including subfolders)
+2. Show what was updated
 
 ### `/setup status`
-Mostrar estado atual.
+Show current state.
 
-1. Listar skills instaladas com versao
-2. Verificar se secrets.env existe e quais tokens estao configurados
-3. Testar conexao de cada API configurada
+1. List installed skills with version
+2. Check if secrets.env exists and which tokens are configured
+3. Test connection for each configured API
 
 ---
 
-## Catalogo de Skills
+## Skills vs Plugins
 
-### Capacidades (independentes)
-| Skill | Descricao | Precisa API? | Scopes |
-|-------|-----------|-------------|--------|
-| **brand** | Cores, fontes e estilo visual da Inbox | Nao | — |
-| **workdrive** | CRUD de pastas/arquivos no Zoho WorkDrive | Sim | WorkDrive.files.ALL, WorkDrive.organization.ALL, WorkDrive.workspace.ALL |
-| **doc** | Criar/atualizar docs no Zoho Writer | Sim | ZohoWriter.documentEditor.ALL, ZohoWriter.merge.ALL, ZohoPC.files.ALL |
-| **meet** | Gravacoes e meetings do Zoho Meet | Sim | ZohoMeeting.meetinguds.READ, ZohoFiles.files.READ, ZohoMeeting.recording.READ, ZohoMeeting.recording.DELETE, ZohoMeeting.meeting.READ, ZohoMeeting.meeting.CREATE, ZohoMeeting.meeting.UPDATE, ZohoMeeting.meeting.DELETE, ZohoMeeting.manageOrg.READ |
-| **transcribe** | Transcricao local com Whisper | Nao | — |
+There are two ways to add capabilities:
 
-### Workflows (combinam capacidades)
-| Skill | Descricao | Deps obrigatorias | Deps opcionais |
-|-------|-----------|-------------------|----------------|
-| **case** | Gestao de cases Email Intelligence | workdrive, doc, brand | meet, transcribe |
+- **Skills** (`~/.claude/skills/`) — custom skills created by the team, managed via this /setup skill and the GitHub repo. These are specific to our workflows (Inbox brand, Zoho APIs, case management).
+- **Plugins** (`~/.claude/plugins/`) — installed via `claude plugin install name@marketplace`. These are community/official plugins for general capabilities (LSP, code review, skill-creator, etc.).
+
+This skill manages **custom skills only**. For plugins, use `claude plugin install/uninstall`.
+
+---
+
+## Skill Catalog
+
+### Standalone skills
+| Skill | Version | Description | Needs API? | Scopes |
+|-------|---------|-------------|------------|--------|
+| **brand** | 0.2.0 | Inbox brand colors, fonts, visual style | No | — |
+| **workdrive** | 0.4.0 | File/folder management in Zoho WorkDrive | Yes | WorkDrive.files.ALL, WorkDrive.organization.ALL, WorkDrive.workspace.ALL |
+| **doc** | 0.3.0 | Create/read/update Zoho Writer docs with Inbox brand style | Yes | ZohoWriter.documentEditor.ALL, ZohoWriter.merge.ALL, ZohoPC.files.ALL |
+| **meet** | — | Zoho Meet recordings and meetings | Yes | ZohoMeeting.meetinguds.READ, ZohoFiles.files.READ, ZohoMeeting.recording.*, ZohoMeeting.meeting.*, ZohoMeeting.manageOrg.READ |
+| **transcribe** | — | Local audio/video transcription with Whisper | No | — |
+
+### Workflow skills (combine standalone skills)
+| Skill | Description | Required deps | Optional deps |
+|-------|-------------|---------------|---------------|
+| **case** | Email Intelligence case management | workdrive, doc, brand | meet, transcribe |
 
 ---
 
 ## secrets.env
 
-Localizado em `~/.claude/secrets.env`. Template:
+Located at `~/.claude/secrets.env`. Template:
 
 ```env
-# Zoho OAuth2 — Client (compartilhado entre todas as APIs)
+# Zoho OAuth2 — Client (shared across all APIs)
 ZOHO_CLIENT_ID=
 ZOHO_CLIENT_SECRET=
 ZOHO_ORG_ID=
 
-# Tokens por skill (cada um com seus escopos)
+# Refresh tokens per skill (each with its own scopes)
 ZOHO_REFRESH_TOKEN_WORKDRIVE=
 ZOHO_REFRESH_TOKEN_WRITER=
 ZOHO_REFRESH_TOKEN_MEET=
 ```
 
-Cada token e gerado independentemente com os escopos da skill correspondente.
+Note: WORKDRIVE and WRITER currently share the same refresh token (same Self Client with combined scopes). MEET has a separate token with its own scopes.
 
 ---
 
-## Guia de criacao do Self Client Zoho
+## Self Client Creation Guide
 
-1. Acesse console.zoho.com
-2. Clique em "Add Client"
-3. Escolha "Self Client"
-4. Anote o **Client ID** e **Client Secret**
-5. Clique em "Generate Code"
-6. Cole os escopos necessarios (separados por virgula)
-7. Selecione duracao de 10 minutos
-8. Selecione o portal/org correto
-9. Clique em "Create"
-10. Copie o code gerado e cole quando o /setup pedir
+1. Go to console.zoho.com
+2. Click "Add Client"
+3. Choose "Self Client"
+4. Note the **Client ID** and **Client Secret**
+5. Click "Generate Code"
+6. Paste required scopes (comma-separated)
+7. Set duration to 10 minutes
+8. Select the correct portal/org
+9. Click "Create"
+10. Copy the generated code and paste when /setup asks for it

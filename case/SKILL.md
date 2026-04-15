@@ -1,8 +1,8 @@
 ---
 name: case
-description: This skill should be used when the user asks to "create a new case", "document a case", "fill case data", "check case status", "analyze a case", "generate one-pager", "rank cases", "check claims", "generate case visual". Manages Email Intelligence case studies.
-version: 0.5.0
-allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, mcp__zoho-sheet__*, mcp__zoho-workdrive__*, mcp__zoho-writer__*]
+description: Manage Email Intelligence case studies — create cases, fill data, check status, analyze proof strength, generate one-pagers, rank cases, check claim coverage. Use when user mentions "case", "caso", "case study", "criar case", "case novo", "preencher case", "status do case", "analisar case", "one-pager", "ranking de cases", "claims", "evidencia", "depoimento", "proof checklist", "hormozi". This is a workflow skill that orchestrates /doc, /workdrive, and /brand. Do NOT use for generic document creation (that's /doc), file management (that's /workdrive), or meeting operations (that's /meet).
+version: 0.6.0
+allowed-tools: [Read, Write, Edit, Glob, Grep, Bash, Agent, Skill]
 argument-hint: <subcommand> [cliente]
 ---
 
@@ -16,15 +16,16 @@ Workflow que orquestra o ciclo completo de cases: criacao de pasta, documentos b
 
 ### Obrigatorias (sem essas, /case nao roda)
 Antes de executar qualquer subcomando, verificar se existem em `~/.claude/skills/`:
-- `/workdrive` — criar pastas, listar arquivos
-- `/doc` — criar/atualizar documentos no Writer
+- `/workdrive` — criar pastas, listar arquivos, upload, download
+- `/doc` — criar/ler/atualizar documentos no Writer
 - `/brand` — cores, fontes e estilo dos templates
 
 Se faltar alguma: informar o usuario e instruir a usar `/setup` pra instalar.
 
-### Opcionais (funciona sem, mas com funcionalidade reduzida)
-- `/meet` — baixar gravacoes de meetings
-- `/transcribe` — transcrever audio/video com Whisper
+**IMPORTANTE:** Toda operacao com WorkDrive, Writer ou Sheets deve ser feita via skills (`/workdrive`, `/doc`) e NAO via MCP tools. As skills contem os endpoints REST corretos e autenticacao via OAuth2.
+
+### Opcionais
+- `/meet` — baixar gravacoes de meetings para uso como evidência
 
 ---
 
@@ -60,12 +61,18 @@ Criar um novo case para o cliente informado.
    a. Criar pasta do cliente em `cases/` (usando /workdrive)
    b. Criar subpasta `Evidencias` dentro da pasta do cliente (usando /workdrive)
       - Aqui serao armazenados prints, screenshots, gravacoes e qualquer arquivo de prova
-   c. Criar 3 docs na pasta principal do cliente (usando /doc + /brand pra estilo):
+   c. **ANTES de criar qualquer doc:** listar arquivos da pasta do cliente no WorkDrive para verificar se os docs ja existem
+   d. Para cada doc que **NAO existe**, criar (usando /doc + /brand pra estilo):
       - `filename=Case Document - [Cliente]` usando `templates/case-document.html`
       - `filename=Transcription - [Cliente]` usando `templates/transcription.html`
       - `filename=One-Pager - [Cliente]` usando `templates/onepager.html`
-   d. Substituir "ACME" pelo nome real do cliente nos HTMLs antes de enviar
-5. Se ja existir pasta: pular criacao, informar que pasta ja existe
+   e. Para cada doc que **JA existe**, ler o conteudo atual antes de qualquer alteracao — nunca criar duplicata
+   f. Substituir "ACME" pelo nome real do cliente nos HTMLs antes de enviar
+5. Se ja existir pasta:
+   a. Listar arquivos da pasta para ver quais docs ja existem
+   b. Criar somente os docs que faltam
+   c. Para docs existentes: ler conteudo atual e preservar dados ja preenchidos
+   d. **NUNCA criar doc duplicado** — se o doc ja existe, atualizar via `POST /writer/api/v1/documents/DOC_ID` com o conteudo novo
 6. Ler planilha Cases para descobrir proximo ID sequencial (CASE-XXX)
 7. Adicionar linha na planilha Cases com:
    - ID sequencial
@@ -208,3 +215,4 @@ Gerar one-pager de vendas.
 - Formato de depoimento aceita: texto, audio, video, imagem
 - Nunca usar "EmailAnalytics" — sempre "Email Intelligence"
 - Worksheet padrao em planilhas: `"Sheet1"`
+- **No duplicates, merge-first** — the /doc skill enforces this: always check if a doc exists before creating, read existing content before updating, never overwrite blindly. Follow /doc's decision flow for all document operations.
